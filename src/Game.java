@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Game {
-	static String[][] spaces;
+	static String[][] board;
 	static String input;
 	static boolean x_turn;
 	static boolean finished;
@@ -23,58 +23,57 @@ public class Game {
 			if(x_turn){
 				getUserInput();
 			}else{
-				getAIInput(0);
+				getAIInput(1);
 			}
 			x_turn = !x_turn;
 			printBoard();
 			
-			finished = checkForWinner();
+			winner = checkForWinner(board);
+			finished = (winner != "");
 		}
 		
-		System.out.println(winner + " won!!!");
+		System.out.println(
+			(winner == "XO" ? "Everybody" : winner) 
+			+ " won!!!"
+		);
 	}
 	
-	private static boolean checkForWinner() {
+	public static String checkForWinner(String[][] board) {
 		for(int i=0; i<3; i++){
-			if(spaces[0][i] == spaces[1][i] && spaces[1][i] == spaces[2][i]){
-				if( spaces[0][i] != " "){
-					winner = spaces[0][i];
-					return true;
+			if(board[0][i] == board[1][i] && board[1][i] == board[2][i]){
+				if( board[0][i] != " "){
+					return board[0][i];
 				}
 			}
 			
-			if(spaces[i][0] == spaces[i][1] && spaces[i][1] == spaces[i][2]){
-				if( spaces[i][0] != " "){
-					winner = spaces[i][0];
-					return true;
+			if(board[i][0] == board[i][1] && board[i][1] == board[i][2]){
+				if( board[i][0] != " "){
+					return board[i][0];
 				}
 			}
 		}
 		
-		if(spaces[0][0] == spaces[1][1] && spaces[1][1] == spaces[2][2] ){
-			if( spaces[0][0] != " "){
-				winner = spaces[0][0];
-				return true;
+		if(board[0][0] == board[1][1] && board[1][1] == board[2][2] ){
+			if( board[0][0] != " "){
+				return board[0][0];
 			}
 		}
 		
-		if(spaces[2][0] == spaces[1][1] && spaces[1][1] == spaces[0][2]){
-			if( spaces[2][0] != " "){
-				winner = spaces[2][0];
-				return true;
+		if(board[2][0] == board[1][1] && board[1][1] == board[0][2]){
+			if( board[2][0] != " "){
+				return board[2][0];
 			}
 		}
 		
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
-				if(spaces[i][j] == " "){
-					return false;
+				if(board[i][j] == " "){
+					return "";
 				}
 			}
 		}
 		
-		winner = "Everybody";
-		return true;
+		return "XO";
 	}
 
 	private static void getAIInput(int selection) {
@@ -84,28 +83,41 @@ public class Game {
 			
 			break;
 		case 1:
+			minimaxMove();
+			
 			break;
 		case 2:
+			expectimaxMove();
+			
 			break;
 		}
 	}
 
 	private static void randomMove() {
-		ArrayList<String> unfilled = new ArrayList<String>();
+		ArrayList<Move> unfilled = new ArrayList<Move>();
 		
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
-				if(spaces[i][j] == " "){
-					unfilled.add(String.valueOf(i) + String.valueOf(j));
+				if(board[i][j] == " "){
+					unfilled.add(new Move(i,j));
 				}
 			}
 		}
 		
-		String move = unfilled.get(rand.nextInt(unfilled.size()));
+		Move move = unfilled.get(rand.nextInt(unfilled.size()));
 		
 		makeMove(move);
 	}
+	
+	private static void minimaxMove() {
+		Move move = Minimax.pickMove(board, (x_turn ? "X" : "O"));
+		makeMove(move);
+	}
 
+	private static void expectimaxMove() {
+		// TODO Auto-generated method stub	
+	}
+	
 	private static void getUserInput() throws IOException {
 		String input = null;
 		boolean valid = false;
@@ -118,14 +130,16 @@ public class Game {
 			valid = isValidInput(input);
 		}
 		
-		makeMove(input);
+		makeMove(
+			new Move(
+				Character.getNumericValue(input.charAt(0)),
+				Character.getNumericValue(input.charAt(1))
+			)
+		);
 	}
 
-	private static void makeMove(String move) {
-		int row = Character.getNumericValue(move.charAt(0));
-		int col = Character.getNumericValue(move.charAt(1));
-		
-		spaces[row][col] = (x_turn ? "X" : "O");
+	private static void makeMove(Move move) {
+		board[move.row][move.column] = (x_turn ? "X" : "O");
 	}
 
 	private static void printBoard(){
@@ -138,11 +152,11 @@ public class Game {
 		System.out.print("\n");
 		
 		System.out.print("0");
-		System.out.print(spaces[0][0]);
+		System.out.print(board[0][0]);
 		System.out.print("|");
-		System.out.print(spaces[0][1]);
+		System.out.print(board[0][1]);
 		System.out.print("|");
-		System.out.print(spaces[0][2]);
+		System.out.print(board[0][2]);
 		
 		System.out.print("\n");
 		System.out.print(" ");
@@ -154,11 +168,11 @@ public class Game {
 		System.out.print("\n");
 		
 		System.out.print("1");
-		System.out.print(spaces[1][0]);
+		System.out.print(board[1][0]);
 		System.out.print("|");
-		System.out.print(spaces[1][1]);
+		System.out.print(board[1][1]);
 		System.out.print("|");
-		System.out.print(spaces[1][2]);
+		System.out.print(board[1][2]);
 		
 		System.out.print("\n");
 		System.out.print(" ");
@@ -170,20 +184,20 @@ public class Game {
 		System.out.print("\n");
 		
 		System.out.print("2");
-		System.out.print(spaces[2][0]);
+		System.out.print(board[2][0]);
 		System.out.print("|");
-		System.out.print(spaces[2][1]);
+		System.out.print(board[2][1]);
 		System.out.print("|");
-		System.out.print(spaces[2][2]);
+		System.out.print(board[2][2]);
 		
 		System.out.print("\n");
 	}
 	
 	private static void initialize(){
-		spaces = new String[3][3];
+		board = new String[3][3];
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
-				spaces[i][j] = " ";
+				board[i][j] = " ";
 			}
 		}
 		x_turn = true;
@@ -201,7 +215,7 @@ public class Game {
 				isValidDigit(in.charAt(0)) && 
 				isValidDigit(in.charAt(1))
 			){
-				if( spaces[
+				if( board[
 				      Character.getNumericValue(in.charAt(0))
 				    ][
 				      Character.getNumericValue(in.charAt(1))

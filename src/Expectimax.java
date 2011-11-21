@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 
-public class Minimax {
+public class Expectimax {
 	static int depth;
 	public static Move pickMove(String[][] board, String my_char){
 		ArrayList<Move> possible_moves = new ArrayList<Move>();
@@ -31,6 +31,7 @@ public class Minimax {
 		return curr_max_index;
 	}
 
+	//I made a move, what is the value
 	private static Integer evalMyMove(Move move, String[][] board, String my_char) {
 		//Set move
 		board[move.row][move.column] = my_char;
@@ -50,8 +51,8 @@ public class Minimax {
 					values.add(evalOtherMove(possible_moves.get(i), board, my_char));
 				}
 				
-				//Get min, as my opponent goes next and will seek to minimize my score
-				value = getMin(values);
+				//Get Expected, as these will be chosen randomly by our opponent
+				value = getExpectedValue(values);
 			}else{
 				value = hueristic(board);
 			}
@@ -60,6 +61,17 @@ public class Minimax {
 		//Unset move and return val
 		board[move.row][move.column] = " ";
 		return value;
+	}
+
+	
+	private static int getExpectedValue(ArrayList<Integer> values) {
+		double sum = 0;
+		
+		for(Integer val : values){
+			sum += (val * (1.0/values.size()));
+		}
+		
+		return (int) sum;
 	}
 
 	private static int hueristic(String[][] board) {
@@ -158,6 +170,7 @@ public class Minimax {
 		return sum;
 	}
 
+	//Opponent made a move, what is the value
 	private static Integer evalOtherMove(Move move, String[][] board, String my_char) {
 		//Set move
 		board[move.row][move.column] = (my_char=="X" ? "O" : "X");
@@ -178,7 +191,7 @@ public class Minimax {
 					values.add(evalMyMove(possible_moves.get(i), board, my_char));
 				}
 				
-				//Get max, since I got next, and I would maximize my score
+				//Get max
 				value = getMax(values);
 			}else{
 				value = hueristic(board);
@@ -190,6 +203,7 @@ public class Minimax {
 		return value;
 	}
 	
+	/*
 	private static int getMin(ArrayList<Integer> values) {
 		int curr_min = 2;
 		for(int i = 0; i<values.size(); i++){
@@ -199,6 +213,7 @@ public class Minimax {
 		}
 		return curr_min;
 	}
+	*/
 	
 	private static int getMax(ArrayList<Integer> values) {
 		int curr_max = -2;

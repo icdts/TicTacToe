@@ -17,25 +17,27 @@ public class Game {
     static BufferedReader stdin;
 	
 	public static void main(String[] args) throws IOException{
-		initialize();
-		printBoard();
-		while(!finished){
-			if(x_turn){
-				getUserInput();
-			}else{
-				getAIInput(1);
+		for( int i = 0; i<10; i++){
+			initialize();
+			//printBoard();
+			while(!finished){
+				if(x_turn){
+					getAIInput(1);
+				}else{
+					getAIInput(0);
+				}
+				x_turn = !x_turn;
+				//printBoard();
+				
+				winner = checkForWinner(board);
+				finished = (winner != "");
 			}
-			x_turn = !x_turn;
-			printBoard();
 			
-			winner = checkForWinner(board);
-			finished = (winner != "");
+			System.out.println(
+				(winner == "XO" ? "Everybody" : winner) 
+				+ " won!!!"
+			);
 		}
-		
-		System.out.println(
-			(winner == "XO" ? "Everybody" : winner) 
-			+ " won!!!"
-		);
 	}
 	
 	public static String checkForWinner(String[][] board) {
@@ -115,7 +117,8 @@ public class Game {
 	}
 
 	private static void expectimaxMove() {
-		// TODO Auto-generated method stub	
+		Move move = Expectimax.pickMove(board, (x_turn ? "X" : "O"));
+		makeMove(move);
 	}
 	
 	private static void getUserInput() throws IOException {

@@ -9,8 +9,8 @@ public class Minimax {
 		
 		possible_moves = getPossibleMoves(board);
 		
-		depth = 0;
 		for(int i=0; i<possible_moves.size(); i++){
+			depth = 0;
 			values.add(evalMyMove(possible_moves.get(i),board, my_char));
 		}
 		
@@ -20,7 +20,7 @@ public class Minimax {
 	}
 	
 	public static int getIndexOfMax(ArrayList<Integer> values){
-		int curr_max = -2;
+		int curr_max = -200;
 		int curr_max_index = -1;
 		for(int i = 0; i<values.size(); i++){
 			if(values.get(i) > curr_max){
@@ -53,109 +53,13 @@ public class Minimax {
 				//Get min, as my opponent goes next and will seek to minimize my score
 				value = getMin(values);
 			}else{
-				value = hueristic(board);
+				value = hueristic(board, my_char);
 			}
 		}
 		
 		//Unset move and return val
 		board[move.row][move.column] = " ";
 		return value;
-	}
-
-	private static int hueristic(String[][] board) {
-		int sum = 0;
-		
-		int x_count = 0;
-		int o_count = 0;
-		
-		for(int r=0; r<3; r++){
-			for(int c=0; c<3; c++){
-				if(board[r][c] == "X"){
-					x_count++;
-				}else if(board[r][c] == "O"){
-					o_count++;
-				}
-			}
-			
-			if(x_count > 0 && o_count == 0){
-				sum += x_count;
-			}else if(x_count == 0 && o_count > 0){
-				sum -= o_count;
-			}
-			
-			x_count = 0;
-			o_count = 0;
-		}
-		
-		for(int c=0; c<3; c++){
-			for(int r=0; r<3; r++){
-				if(board[r][c] == "X"){
-					x_count++;
-				}else if(board[r][c] == "O"){
-					o_count++;
-				}
-			}
-			
-			if(x_count > 0 && o_count == 0){
-				sum += x_count;
-			}else if(x_count == 0 && o_count > 0){
-				sum -= o_count;
-			}
-			
-			x_count = 0;
-			o_count = 0;
-		}
-		
-		//first diagonal
-		if(board[0][0] == "X"){
-			x_count += 1;
-		}else if(board[0][0] == "O"){
-			o_count += 1;
-		}
-		if(board[1][1] == "X"){
-			x_count += 1;
-		}else if(board[1][1] == "O"){
-			o_count += 1;
-		}
-		if(board[2][2] == "X"){
-			x_count += 1;
-		}else if(board[2][2] == "O"){
-			o_count += 1;
-		}
-		
-		if(x_count > 0 && o_count == 0){
-			sum += x_count;
-		}else if(x_count == 0 && o_count > 0){
-			sum -= o_count;
-		}
-		
-		x_count = 0;
-		o_count = 0;
-		
-		//second diagonal
-		if(board[2][0] == "X"){
-			x_count += 1;
-		}else if(board[2][0] == "O"){
-			o_count += 1;
-		}
-		if(board[1][1] == "X"){
-			x_count += 1;
-		}else if(board[1][1] == "O"){
-			o_count += 1;
-		}
-		if(board[0][2] == "X"){
-			x_count += 1;
-		}else if(board[0][2] == "O"){
-			o_count += 1;
-		}
-		
-		if(x_count > 0 && o_count == 0){
-			sum += x_count;
-		}else if(x_count == 0 && o_count > 0){
-			sum -= o_count;
-		}
-		
-		return sum;
 	}
 
 	private static Integer evalOtherMove(Move move, String[][] board, String my_char) {
@@ -181,7 +85,7 @@ public class Minimax {
 				//Get max, since I got next, and I would maximize my score
 				value = getMax(values);
 			}else{
-				value = hueristic(board);
+				value = hueristic(board, my_char);
 			}
 		}
 		
@@ -191,7 +95,7 @@ public class Minimax {
 	}
 	
 	private static int getMin(ArrayList<Integer> values) {
-		int curr_min = 2;
+		int curr_min = 200;
 		for(int i = 0; i<values.size(); i++){
 			if(values.get(i) < curr_min){
 				curr_min = values.get(i);
@@ -201,7 +105,7 @@ public class Minimax {
 	}
 	
 	private static int getMax(ArrayList<Integer> values) {
-		int curr_max = -2;
+		int curr_max = -200;
 		for(int i = 0; i<values.size(); i++){
 			if(values.get(i) > curr_max){
 				curr_max = values.get(i);
@@ -234,5 +138,115 @@ public class Minimax {
 		}
 		
 		return 0;
+	}
+	
+	private static int hueristic(String[][] board, String my_char) {
+		int sum = 0;
+		
+		int x_count = 0;
+		int o_count = 0;
+		
+		for(int r=0; r<3; r++){
+			for(int c=0; c<3; c++){
+				if(board[r][c] == "X"){
+					x_count++;
+				}else if(board[r][c] == "O"){
+					o_count++;
+				}
+			}
+			
+			sum += getSubValue(x_count,o_count,my_char);
+			
+			x_count = 0;
+			o_count = 0;
+		}
+		
+		for(int c=0; c<3; c++){
+			for(int r=0; r<3; r++){
+				if(board[r][c] == "X"){
+					x_count++;
+				}else if(board[r][c] == "O"){
+					o_count++;
+				}
+			}
+			
+			sum += getSubValue(x_count,o_count,my_char);
+			
+			x_count = 0;
+			o_count = 0;
+		}
+		
+		//first diagonal
+		if(board[0][0] == "X"){
+			x_count += 1;
+		}else if(board[0][0] == "O"){
+			o_count += 1;
+		}
+		if(board[1][1] == "X"){
+			x_count += 1;
+		}else if(board[1][1] == "O"){
+			o_count += 1;
+		}
+		if(board[2][2] == "X"){
+			x_count += 1;
+		}else if(board[2][2] == "O"){
+			o_count += 1;
+		}
+		
+		sum += getSubValue(x_count,o_count,my_char);
+		
+		x_count = 0;
+		o_count = 0;
+		
+		//second diagonal
+		if(board[2][0] == "X"){
+			x_count += 1;
+		}else if(board[2][0] == "O"){
+			o_count += 1;
+		}
+		if(board[1][1] == "X"){
+			x_count += 1;
+		}else if(board[1][1] == "O"){
+			o_count += 1;
+		}
+		if(board[0][2] == "X"){
+			x_count += 1;
+		}else if(board[0][2] == "O"){
+			o_count += 1;
+		}
+		
+		sum += getSubValue(x_count,o_count,my_char);
+		
+		return sum;
+	}
+	
+	private static Integer getSubValue(int x_count, int o_count, String my_char){
+		int sum = 0;
+		int tmp;
+		
+		if(x_count > 0 && o_count == 0){
+			if(x_count == 3){
+				tmp = 100;
+			}else{
+				tmp = x_count;
+			}
+			if(my_char == "X"){
+				sum += tmp;
+			}else{
+				sum -= tmp;
+			}
+		}else if(x_count == 0 && o_count > 0){
+			if(o_count == 3){
+				tmp = 100;
+			}else{
+				tmp = o_count;
+			}
+			if(my_char == "O"){
+				sum += tmp;
+			}else{
+				sum -= tmp;
+			}
+		}
+		return sum;
 	}
 }

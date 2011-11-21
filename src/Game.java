@@ -24,7 +24,7 @@ public class Game {
 				if(x_turn){
 					getAIInput(1);
 				}else{
-					getAIInput(0);
+					getAIInput(2);
 				}
 				x_turn = !x_turn;
 				//printBoard();
@@ -37,6 +37,23 @@ public class Game {
 				(winner == "XO" ? "Everybody" : winner) 
 				+ " won!!!"
 			);
+		}
+	}
+	
+	private static void getAIInput(int selection) {
+		switch(selection){
+		case 0:
+			randomMove();
+			
+			break;
+		case 1:
+			minimaxMove();
+			
+			break;
+		case 2:
+			expectimaxMove();
+			
+			break;
 		}
 	}
 	
@@ -76,23 +93,6 @@ public class Game {
 		}
 		
 		return "XO";
-	}
-
-	private static void getAIInput(int selection) {
-		switch(selection){
-		case 0:
-			randomMove();
-			
-			break;
-		case 1:
-			minimaxMove();
-			
-			break;
-		case 2:
-			expectimaxMove();
-			
-			break;
-		}
 	}
 
 	private static void randomMove() {

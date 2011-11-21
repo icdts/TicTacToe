@@ -9,8 +9,8 @@ public class Expectimax {
 		
 		possible_moves = getPossibleMoves(board);
 		
-		depth = 0;
 		for(int i=0; i<possible_moves.size(); i++){
+			depth = 0;
 			values.add(evalMyMove(possible_moves.get(i),board, my_char));
 		}
 		
@@ -20,7 +20,7 @@ public class Expectimax {
 	}
 	
 	public static int getIndexOfMax(ArrayList<Integer> values){
-		int curr_max = -2;
+		int curr_max = -200;
 		int curr_max_index = -1;
 		for(int i = 0; i<values.size(); i++){
 			if(values.get(i) > curr_max){
@@ -28,6 +28,7 @@ public class Expectimax {
 				curr_max_index = i;
 			}
 		}
+
 		return curr_max_index;
 	}
 
@@ -54,7 +55,7 @@ public class Expectimax {
 				//Get Expected, as these will be chosen randomly by our opponent
 				value = getExpectedValue(values);
 			}else{
-				value = hueristic(board);
+				value = hueristic(board, my_char);
 			}
 		}
 		
@@ -74,7 +75,7 @@ public class Expectimax {
 		return (int) sum;
 	}
 
-	private static int hueristic(String[][] board) {
+	private static int hueristic(String[][] board, String my_char) {
 		int sum = 0;
 		
 		int x_count = 0;
@@ -89,11 +90,7 @@ public class Expectimax {
 				}
 			}
 			
-			if(x_count > 0 && o_count == 0){
-				sum += x_count;
-			}else if(x_count == 0 && o_count > 0){
-				sum -= o_count;
-			}
+			sum += getSubValue(x_count,o_count,my_char);
 			
 			x_count = 0;
 			o_count = 0;
@@ -108,11 +105,7 @@ public class Expectimax {
 				}
 			}
 			
-			if(x_count > 0 && o_count == 0){
-				sum += x_count;
-			}else if(x_count == 0 && o_count > 0){
-				sum -= o_count;
-			}
+			sum += getSubValue(x_count,o_count,my_char);
 			
 			x_count = 0;
 			o_count = 0;
@@ -135,11 +128,7 @@ public class Expectimax {
 			o_count += 1;
 		}
 		
-		if(x_count > 0 && o_count == 0){
-			sum += x_count;
-		}else if(x_count == 0 && o_count > 0){
-			sum -= o_count;
-		}
+		sum += getSubValue(x_count,o_count,my_char);
 		
 		x_count = 0;
 		o_count = 0;
@@ -161,12 +150,26 @@ public class Expectimax {
 			o_count += 1;
 		}
 		
-		if(x_count > 0 && o_count == 0){
-			sum += x_count;
-		}else if(x_count == 0 && o_count > 0){
-			sum -= o_count;
-		}
+		sum += getSubValue(x_count,o_count,my_char);
 		
+		return sum;
+	}
+	
+	private static Integer getSubValue(int x_count, int o_count, String my_char){
+		int sum = 0;
+		if(x_count > 0 && o_count == 0){
+			if(my_char == "X"){
+				sum += x_count;
+			}else{
+				sum -= x_count;
+			}
+		}else if(x_count == 0 && o_count > 0){
+			if(my_char == "O"){
+				sum += o_count;
+			}else{
+				sum -= o_count;
+			}
+		}
 		return sum;
 	}
 
@@ -194,7 +197,7 @@ public class Expectimax {
 				//Get max
 				value = getMax(values);
 			}else{
-				value = hueristic(board);
+				value = hueristic(board, my_char);
 			}
 		}
 		
@@ -205,7 +208,7 @@ public class Expectimax {
 	
 	/*
 	private static int getMin(ArrayList<Integer> values) {
-		int curr_min = 2;
+		int curr_min = 200;
 		for(int i = 0; i<values.size(); i++){
 			if(values.get(i) < curr_min){
 				curr_min = values.get(i);
@@ -216,7 +219,7 @@ public class Expectimax {
 	*/
 	
 	private static int getMax(ArrayList<Integer> values) {
-		int curr_max = -2;
+		int curr_max = -200;
 		for(int i = 0; i<values.size(); i++){
 			if(values.get(i) > curr_max){
 				curr_max = values.get(i);

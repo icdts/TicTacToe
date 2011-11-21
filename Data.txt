@@ -1,0 +1,70 @@
+Robert M. Nolan
+
+CS463 - AI  - Program 5
+
+User vs. Random:  
+    User:       10
+    Random:     0
+    Tie:        0
+    
+Random vs. User:  
+    User:       8
+    Random:     0
+    Tie:        2
+    
+User vs. Minimax:
+    User:       0
+    Random:     0
+    Tie:        10
+    
+Minimax vs. User:
+    User:       0
+    Random:     0
+    Tie:        10
+    
+Expectimax vs. Random:
+    Expectimax: 10
+    Random:     0
+    Tie:        0
+    
+Random vs. Expectimax:
+    Expectimax: 8
+    Random:     0
+    Tie:        2
+    
+Description of Interface and Implementation:
+    Interface is simply ascii.  If you compile the java, and run it, it will 
+    display an empty ascii board with numbers on the side.  You enter the row,
+    then column, with no spaces between.  In the main function of Game, there is
+    a call to the function "getAIInput".  Changing the integer fed into that 
+    changes the strategy used.  0 for random, 1 for minimax, 2 for expectimax.
+    Keep in mind the main function is in Game.
+    
+    Minimax and expectimax each have their own class.  Expectimax is a duplicate
+    of minimax, except for the function evalMyMove, which was changed to 
+    assume the other players moves would be chosen at random, rather than 
+    seeking to minimize the score.
+    
+    evalMyMove is given the current move, and the board state.  It makes that 
+    move, then evaluates the possible consequences of the action.  Once it
+    has a value, it undoes the move and returns the value.
+    
+    evalOther move is also given the current move, and the board state.  It 
+    does essentially the same thing, only assumes the move it is given is made
+    by the opponent.
+    
+    These two functions are called recursively to evaluate all possible moves.
+    There is a global depth variable that is incremented by both to know
+    when to stop and use the hueristic.
+    
+    I did 20 runs of each matchup asked for.  10 with one in the first postion,
+    and 10 with the other contender going first.  The person who goes first has
+    a distinct advantage, so I figured this was necessary to avoid bias.
+    
+What I learned:
+    Expectimax did much better than I anticipated.  When paired against Minimax
+    (this matchup wasn't asked for, but I was curious), it always tied.  
+    Treating the opponent as a random agent doesn't seem to be a bad strategy
+    in this instance.  Though, the random factor was limited due to the use
+    of a heuristic once the depth was 2.  I did not try it with both evaluating
+    the entire tree.
